@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Bifröst">
+  <title>Bifröst</title>
+  <desc>The rainbow bridge Bifröst within a runic medallion — MimirMind API bridge, a sibling of the MimirMind mark.</desc>
+
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="65%">
+      <stop offset="0%"   stop-color="#1A2A4A"/>
+      <stop offset="100%" stop-color="#06091A"/>
+    </radialGradient>
+
+    <linearGradient id="bronze" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#E8B968"/>
+      <stop offset="50%"  stop-color="#C8923D"/>
+      <stop offset="100%" stop-color="#8C5E20"/>
+    </linearGradient>
+
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#E8B968" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#E8B968" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Medallion (shared frame with the MimirMind mark) -->
+  <circle cx="128" cy="128" r="122" fill="url(#bg)" stroke="url(#bronze)" stroke-width="3"/>
+  <circle cx="128" cy="128" r="110" fill="none"     stroke="url(#bronze)" stroke-width="0.8" opacity="0.55"/>
+
+  <!-- Cardinal runic marks -->
+  <g stroke="url(#bronze)" stroke-width="2" stroke-linecap="round" fill="none">
+    <!-- top: Ansuz-like (knowledge / divine breath) -->
+    <line x1="128" y1="18" x2="128" y2="32"/>
+    <line x1="128" y1="22" x2="134" y2="26"/>
+    <line x1="128" y1="27" x2="134" y2="31"/>
+    <!-- right: arrow inward -->
+    <line x1="238" y1="128" x2="222" y2="128"/>
+    <line x1="232" y1="122" x2="222" y2="128"/>
+    <line x1="232" y1="134" x2="222" y2="128"/>
+    <!-- left: arrow inward -->
+    <line x1="18"  y1="128" x2="34"  y2="128"/>
+    <line x1="24"  y1="122" x2="34"  y2="128"/>
+    <line x1="24"  y1="134" x2="34"  y2="128"/>
+  </g>
+  <!-- bottom: a sealed dot -->
+  <circle cx="128" cy="238" r="3" fill="url(#bronze)"/>
+
+  <!-- Filler dots between cardinal marks -->
+  <g fill="url(#bronze)" opacity="0.75">
+    <circle cx="80"  cy="34"  r="1.8"/>
+    <circle cx="176" cy="34"  r="1.8"/>
+    <circle cx="220" cy="80"  r="1.8"/>
+    <circle cx="220" cy="176" r="1.8"/>
+    <circle cx="176" cy="222" r="1.8"/>
+    <circle cx="80"  cy="222" r="1.8"/>
+    <circle cx="36"  cy="176" r="1.8"/>
+    <circle cx="36"  cy="80"  r="1.8"/>
+  </g>
+
+  <!-- Soft aura behind the bridge -->
+  <circle cx="128" cy="140" r="82" fill="url(#aura)"/>
+
+  <!-- Horizon between the two realms -->
+  <line x1="60" y1="164" x2="196" y2="164" stroke="url(#bronze)" stroke-width="1.6" opacity="0.4"/>
+
+  <!-- Bifröst: the arched bridge, banded in bronze -->
+  <g fill="none" stroke="url(#bronze)" stroke-linecap="round">
+    <path d="M64 164 A64 64 0 0 1 192 164" stroke-width="7"/>
+    <path d="M76 164 A52 52 0 0 1 180 164" stroke-width="5.5" opacity="0.8"/>
+    <path d="M88 164 A40 40 0 0 1 168 164" stroke-width="4"   opacity="0.6"/>
+  </g>
+
+  <!-- The two realms the bridge joins -->
+  <circle cx="64"  cy="164" r="7.5" fill="url(#bronze)"/>
+  <circle cx="64"  cy="164" r="3"   fill="#06091A"/>
+  <circle cx="192" cy="164" r="7.5" fill="url(#bronze)"/>
+  <circle cx="192" cy="164" r="3"   fill="#06091A"/>
+
+  <!-- Keystone spark at the crown of the arch (echoes the MimirMind third-eye marker) -->
+  <circle cx="128" cy="100" r="3.6" fill="#1A2A4A" stroke="url(#bronze)" stroke-width="1.6"/>
+</svg>
