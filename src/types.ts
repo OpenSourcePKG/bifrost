@@ -5,7 +5,9 @@ import { Vts } from "vts";
  * ------------------------------------------------------------------ */
 
 export interface AnthMessage {
-    role: "user" | "assistant";
+    // Claude Code interleaves system-reminders as `role:"system"` messages in
+    // the array, so the bridge accepts them alongside user/assistant.
+    role: "user" | "assistant" | "system";
     content: string | AnthBlock[];
 }
 
@@ -66,8 +68,8 @@ export function validateAnthropicRequest(body: unknown): Validated<AnthropicRequ
         const m = b.messages[i];
         if (!Vts.isObject(m)) return { ok: false, error: `messages[${i}] must be an object` };
         const mm = m as Record<string, unknown>;
-        if (mm.role !== "user" && mm.role !== "assistant") {
-            return { ok: false, error: `messages[${i}].role must be "user" or "assistant"` };
+        if (mm.role !== "user" && mm.role !== "assistant" && mm.role !== "system") {
+            return { ok: false, error: `messages[${i}].role must be "user", "assistant" or "system"` };
         }
         if (!Vts.isString(mm.content) && !Vts.isArray(mm.content)) {
             return { ok: false, error: `messages[${i}].content must be a string or an array of blocks` };

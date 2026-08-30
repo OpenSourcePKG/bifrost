@@ -49,6 +49,16 @@ export function translateRequest(req: AnthropicRequest, cfg: Config): OpenAIRequ
 
         const blocks = msg.content as AnthBlock[];
 
+        if (msg.role === "system") {
+            // Claude Code's inline system-reminders stay system messages.
+            const text = blocks
+                .filter((b): b is { type: string; text?: string } => (b as { type?: string }).type === "text")
+                .map((b) => b.text ?? "")
+                .join("\n");
+            if (text.length) messages.push({ role: "system", content: text });
+            continue;
+        }
+
         if (msg.role === "assistant") {
             let text = "";
             const toolCalls: OpenAIToolCall[] = [];
