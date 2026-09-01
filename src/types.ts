@@ -101,9 +101,14 @@ export interface OpenAIToolCall {
     type: "function";
     function: { name: string; arguments: string };
 }
+/** OpenAI multimodal content part (text or an image URL, incl. data: URLs). */
+export type OpenAIContentPart =
+    | { type: "text"; text: string }
+    | { type: "image_url"; image_url: { url: string } };
+
 export type OpenAIMessage =
     | { role: "system"; content: string }
-    | { role: "user"; content: string }
+    | { role: "user"; content: string | OpenAIContentPart[] }
     | { role: "assistant"; content: string | null; tool_calls?: OpenAIToolCall[] }
     | { role: "tool"; tool_call_id: string; content: string };
 
