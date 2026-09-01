@@ -36,6 +36,31 @@ function upstreamHeaders(): Record<string, string> {
     return h;
 }
 
+/**
+ * The client's stable per-conversation id. Claude Code sends it as the
+ * `x-claude-code-session-id` header (and nested in `metadata.user_id`); we
+ * forward it to the upstream so a CLI backend can resume its session
+ * deterministically instead of hashing the transcript. Header first, metadata
+ * as fallback; null if neither is present.
+ */
+function clientSessionId(c: Context, body: unknown): string | null {
+    const header = c.req.header("x-claude-code-session-id");
+    if (header) return header;
+
+    try {
+        const meta = (body as { metadata?: { user_id?: unknown } })?.metadata;
+        const userId = meta?.user_id;
+        if (typeof userId === "string") {
+            const sid = (JSON.parse(userId) as { session_id?: unknown }).session_id;
+            if (typeof sid === "string" && sid) return sid;
+        }
+    } catch {
+        // user_id isn't the JSON blob we expect — no session id to recover.
+    }
+
+    return null;
+}
+
 /** Rough char/4 token estimate — used for the usage fields Claude Code shows. */
 function estimateTokens(body: unknown): number {
     let chars = 0;
@@ -65,13 +90,18 @@ app.post("/v1/messages", async (c) => {
 
     const areq = check.value;
     const oreq = translateRequest(areq, cfg);
-    log("debug", `→ ${oreq.model} (${oreq.messages.length} msgs, stream=${!!areq.stream})`);
+    const sessionId = clientSessionId(c, body);
+    log("debug", `→ ${oreq.model} (${oreq.messages.length} msgs, stream=${!!areq.stream}` +
+        `${sessionId ? `, session=${sessionId}` : ""})`);
+
+    const headers = upstreamHeaders();
+    if (sessionId) headers["x-claude-code-session-id"] = sessionId;
 
     let upstream: Response;
     try {
         upstream = await fetch(`${cfg.upstreamBaseUrl}/chat/completions`, {
             method: "POST",
-            headers: upstreamHeaders(),
+            headers: headers,
             body: JSON.stringify(oreq),
         });
     } catch (e) {
