@@ -76,6 +76,8 @@ export async function* anthropicSSE(
     let finish: string | null = null;
     let outputTokens = 0;
     let outChars = 0;
+    let promptTokens: number | null = null;
+    let cachedTokens = 0;
 
     // OpenAI tool_call array index -> Anthropic content-block index.
     const toolBlock = new Map<number, number>();
@@ -94,6 +96,10 @@ export async function* anthropicSSE(
             const delta = choice.delta ?? {};
 
             if (chunk.usage?.completion_tokens != null) outputTokens = chunk.usage.completion_tokens;
+            if (chunk.usage?.prompt_tokens != null) {
+                promptTokens = chunk.usage.prompt_tokens;
+                cachedTokens = chunk.usage.prompt_tokens_details?.cached_tokens ?? 0;
+            }
 
             // ---- text delta ----
             if (typeof delta.content === "string" && delta.content.length) {
@@ -174,10 +180,23 @@ export async function* anthropicSSE(
 
     if (outputTokens === 0) outputTokens = Math.max(1, Math.round(outChars / 4));
 
+    // Terminal usage carries the REAL input side when upstream reported it
+    // (include_usage final chunk). Anthropic semantics: `input_tokens` excludes
+    // cache reads, which go to `cache_read_input_tokens`. The client's
+    // context-fullness meter (Claude Code's auto-compact trigger) reads these —
+    // with only the message_start estimate it never fires and conversations
+    // grow unboundedly expensive.
+    const usage: Record<string, number> = { output_tokens: outputTokens };
+
+    if (promptTokens !== null) {
+        usage.input_tokens = Math.max(0, promptTokens - cachedTokens);
+        usage.cache_read_input_tokens = Math.min(cachedTokens, promptTokens);
+    }
+
     yield sse("message_delta", {
         type: "message_delta",
         delta: { stop_reason: mapStopReason(finish, hadToolUse), stop_sequence: null },
-        usage: { output_tokens: outputTokens },
+        usage,
     });
     yield sse("message_stop", { type: "message_stop" });
 }
